@@ -14,11 +14,9 @@ import {
   Leaderboard as LeaderboardIcon,
   EmojiEvents as TrophyIcon,
 } from '@mui/icons-material';
-import { usePlayer } from '../context/PlayerContext';
 
 const DashboardHome: React.FC = () => {
   const navigate = useNavigate();
-  const { player } = usePlayer();
 
   const cards = [
     {
@@ -42,7 +40,7 @@ const DashboardHome: React.FC = () => {
       {/* Welcome Section */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h3" fontWeight="bold" gutterBottom>
-          Welcome back, {player?.playerName}! 👋
+          Welcome! 👋
         </Typography>
         <Typography variant="h6" color="text.secondary">
           Ready to play Lucky 4 and win amazing prizes?

@@ -18,7 +18,6 @@ import { gameAPI } from '../services/api';
 const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
   const { setPlayer } = usePlayer();
-  const [playerName, setPlayerName] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -28,11 +27,6 @@ const SignUpPage: React.FC = () => {
     setError('');
 
     // Validation
-    if (!playerName.trim()) {
-      setError('Please enter your name');
-      return;
-    }
-
     if (!email.trim()) {
       setError('Please enter your email');
       return;
@@ -44,20 +38,14 @@ const SignUpPage: React.FC = () => {
       return;
     }
 
-    if (playerName.length > 50) {
-      setError('Name must be 50 characters or less');
-      return;
-    }
-
     // Create game session via API
     setLoading(true);
     try {
-      const response = await gameAPI.createGame(playerName.trim(), email.trim());
+      const response = await gameAPI.createGame(email.trim());
       
-      // Save player info with gameId from backend
+      // Save player info with id from backend
       setPlayer({ 
-        gameId: response.data!.gameId,
-        playerName: playerName.trim(), 
+        id: response.data!.id,
         email: email.trim() 
       });
       navigate('/dashboard');
@@ -117,24 +105,13 @@ const SignUpPage: React.FC = () => {
             <form onSubmit={handleSubmit}>
               <TextField
                 fullWidth
-                label="Your Name"
-                variant="outlined"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                sx={{ mb: 3 }}
-                inputProps={{ maxLength: 50 }}
-                helperText="Enter your name to start playing"
-              />
-
-              <TextField
-                fullWidth
                 type="email"
                 label="Email Address"
                 variant="outlined"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 sx={{ mb: 4 }}
-                helperText="We'll use this to track your scores"
+                helperText="Enter your email to start playing"
               />
 
               <Button

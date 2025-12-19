@@ -5,14 +5,7 @@ import { calculateScore } from '../logic/gameEngine.js';
 // Create a new game session
 export const createGame = async (req, res) => {
   try {
-    const { playerName, playerEmail } = req.body;
-
-    if (!playerName || playerName.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        error: 'Player name is required'
-      });
-    }
+    const { playerEmail } = req.body;
 
     if (!playerEmail || playerEmail.trim() === '') {
       return res.status(400).json({
@@ -30,16 +23,14 @@ export const createGame = async (req, res) => {
       });
     }
 
-    const gameId = await GameModel.createGame(playerName, playerEmail);
+    const game = await GameModel.createGame(playerEmail);
 
     res.status(201).json({
       success: true,
       message: 'Game created successfully',
       data: {
-        gameId,
-        playerName,
-        playerEmail,
-        status: 'created'
+        id: game.id,
+        email: game.email
       }
     });
   } catch (error) {
@@ -121,10 +112,10 @@ export const getGameById = async (req, res) => {
 export const playGame = async (req, res) => {
   try {
     const { id } = req.params;
-    const { playerNumbers } = req.body;
+    const { generatedNumbers } = req.body;
 
-    // Validate player numbers
-    if (!playerNumbers || !Array.isArray(playerNumbers) || playerNumbers.length !== 4) {
+    // Validate generated numbers
+    if (!generatedNumbers || !Array.isArray(generatedNumbers) || generatedNumbers.length !== 4) {
       return res.status(400).json({
         success: false,
         message: 'Please provide exactly 4 numbers'
@@ -132,7 +123,7 @@ export const playGame = async (req, res) => {
     }
 
     // Validate each number is between 1-10
-    const isValid = playerNumbers.every(num => 
+    const isValid = generatedNumbers.every(num => 
       Number.isInteger(num) && num >= 1 && num <= 10
     );
 
@@ -153,28 +144,20 @@ export const playGame = async (req, res) => {
     }
 
     // Get hidden numbers from config
-    const luckyNumbers = getHiddenNumbers();
-
-    // Calculate matches
-    const matches = playerNumbers.filter((num, index) => 
-      num === luckyNumbers[index]
-    ).length;
+    const hiddenNumbers = getHiddenNumbers();
 
     // Calculate score using the formula
-    const score = calculateScore(playerNumbers, luckyNumbers);
+    const score = calculateScore(generatedNumbers, hiddenNumbers);
 
     // Save game result
-    const result = await GameModel.playGame(id, playerNumbers, luckyNumbers, matches, score);
+    const result = await GameModel.playGame(id, generatedNumbers, score);
 
     res.json({
       success: true,
       message: 'Game played successfully',
       data: {
-        playerNumbers,
-        luckyNumbers,
-        matches,
-        score,
-        result: matches === 4 ? 'Jackpot!' : matches >= 2 ? 'Winner!' : 'Try Again'
+        generatedNumbers,
+        score
       }
     });
   } catch (error) {

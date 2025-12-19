@@ -1,37 +1,29 @@
 // TypeScript types for the Lucky 4 game
 
 export interface Player {
-  gameId?: number;
-  playerName: string;
-  email?: string;
+  id?: number;
+  email: string;
 }
 
 export interface GameResult {
-  playerNumbers: number[];
-  luckyNumbers: number[];
-  matches: number;
+  generatedNumbers: number[];
   score: number;
-  result: string;
 }
 
 export interface Game {
   id: number;
-  player_name: string;
-  player_numbers: number[] | null;
-  lucky_numbers: number[] | null;
-  matches: number;
+  email: string;
+  generated_numbers: number[] | null;
   score: number;
-  status: 'active' | 'completed';
+  is_played: boolean;
   created_at: string;
-  played_at: string | null;
 }
 
 export interface LeaderboardEntry {
   id: number;
-  player_name: string;
-  player_email: string;
+  email: string;
   score: number;
-  played_at: string;
+  created_at: string;
 }
 
 export interface PaginationMeta {

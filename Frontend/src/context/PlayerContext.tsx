@@ -13,7 +13,21 @@ const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
 export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [player, setPlayerState] = useState<Player | null>(() => {
     const stored = localStorage.getItem('player');
-    return stored ? JSON.parse(stored) : null;
+    if (stored) {
+      try {
+        const parsedPlayer = JSON.parse(stored);
+        // Clear old player data if it has old structure (gameId or playerName)
+        if ('gameId' in parsedPlayer || 'playerName' in parsedPlayer) {
+          localStorage.removeItem('player');
+          return null;
+        }
+        return parsedPlayer;
+      } catch {
+        localStorage.removeItem('player');
+        return null;
+      }
+    }
+    return null;
   });
 
   const setPlayer = (newPlayer: Player | null) => {

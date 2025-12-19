@@ -75,12 +75,9 @@ const DashboardLayout: React.FC = () => {
             fontWeight: 'bold',
           }}
         >
-          {player?.playerName.charAt(0).toUpperCase()}
+          {player?.email.charAt(0).toUpperCase()}
         </Avatar>
         <Typography variant="subtitle1" fontWeight="bold">
-          {player?.playerName}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
           {player?.email}
         </Typography>
       </Box>

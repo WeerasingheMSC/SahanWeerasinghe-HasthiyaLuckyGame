@@ -135,7 +135,7 @@ const LeaderboardPage: React.FC = () => {
                     <TableBody>
                       {leaderboard.map((entry, index) => {
                         const globalRank = page * rowsPerPage + index + 1;
-                        const playedDate = new Date(entry.played_at).toLocaleDateString('en-US', {
+                        const playedDate = new Date(entry.created_at).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric',
@@ -164,7 +164,7 @@ const LeaderboardPage: React.FC = () => {
                             </TableCell>
                             <TableCell>
                               <Typography variant="body1">
-                                {entry.player_email}
+                                {entry.email}
                               </Typography>
                             </TableCell>
                             <TableCell align="center">
@@ -190,7 +190,7 @@ const LeaderboardPage: React.FC = () => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {leaderboard.map((entry, index) => {
                     const globalRank = page * rowsPerPage + index + 1;
-                    const playedDate = new Date(entry.played_at).toLocaleDateString('en-US', {
+                    const playedDate = new Date(entry.created_at).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
@@ -224,7 +224,7 @@ const LeaderboardPage: React.FC = () => {
                               Email
                             </Typography>
                             <Typography variant="body1" fontWeight="bold">
-                              {entry.player_email}
+                              {entry.email}
                             </Typography>
                           </Box>
 

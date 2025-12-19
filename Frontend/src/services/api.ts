@@ -13,8 +13,8 @@ const api = axios.create({
 // Game API
 export const gameAPI = {
   // Create a new game session
-  createGame: async (playerName: string, playerEmail: string): Promise<ApiResponse<{ gameId: number; playerName: string; playerEmail: string; status: string }>> => {
-    const response = await api.post('/games', { playerName, playerEmail });
+  createGame: async (playerEmail: string): Promise<ApiResponse<{ id: number; email: string }>> => {
+    const response = await api.post('/games', { playerEmail });
     return response.data;
   },
 
@@ -31,8 +31,8 @@ export const gameAPI = {
   },
 
   // Play a game
-  playGame: async (gameId: number, playerNumbers: number[]): Promise<ApiResponse<GameResult>> => {
-    const response = await api.post(`/games/${gameId}/play`, { playerNumbers });
+  playGame: async (gameId: number, generatedNumbers: number[]): Promise<ApiResponse<GameResult>> => {
+    const response = await api.post(`/games/${gameId}/play`, { generatedNumbers });
     return response.data;
   },
 

@@ -18,7 +18,6 @@ import {
 import {
   Casino as CasinoIcon,
   EmojiEvents as TrophyIcon,
-  CheckCircle as CheckIcon,
 } from '@mui/icons-material';
 import { usePlayer } from '../context/PlayerContext';
 import { gameAPI } from '../services/api';
@@ -48,7 +47,7 @@ const PlayGamePage: React.FC = () => {
       return;
     }
 
-    if (!player?.gameId) {
+    if (!player?.id) {
       setError('Game session not found. Please sign up again.');
       return;
     }
@@ -57,8 +56,8 @@ const PlayGamePage: React.FC = () => {
     setError(null);
 
     try {
-      const playerNumbers = numbers as number[];
-      const response = await gameAPI.playGame(player.gameId, playerNumbers);
+      const generatedNumbers = numbers as number[];
+      const response = await gameAPI.playGame(player.id, generatedNumbers);
 
       setResult(response.data!);
       setShowResult(true);
@@ -74,22 +73,6 @@ const PlayGamePage: React.FC = () => {
     setResult(null);
     setShowResult(false);
     setError(null);
-  };
-
-  const getScoreColor = (matches: number) => {
-    if (matches === 4) return '#f5576c';
-    if (matches === 3) return '#667eea';
-    if (matches === 2) return '#00bcd4';
-    if (matches === 1) return '#4caf50';
-    return '#9e9e9e';
-  };
-
-  const getPrizeLabel = (matches: number) => {
-    if (matches === 4) return 'JACKPOT! 🎰';
-    if (matches === 3) return 'Amazing! 🌟';
-    if (matches === 2) return 'Great! 🎉';
-    if (matches === 1) return 'Good! 👍';
-    return 'Try Again! 🍀';
   };
 
   return (
@@ -270,21 +253,28 @@ const PlayGamePage: React.FC = () => {
         TransitionComponent={Fade}
       >
         <Box sx={{ textAlign: 'center', pt: 4, px: 3 }}>
-          <TrophyIcon sx={{ fontSize: 80, color: getScoreColor(result?.matches || 0) }} />
+          <TrophyIcon sx={{ fontSize: 80, color: '#667eea' }} />
           <Typography variant="h4" fontWeight="bold" sx={{ mt: 2 }}>
-            {getPrizeLabel(result?.matches || 0)}
+            Game Complete!
           </Typography>
         </Box>
         <DialogContent sx={{ textAlign: 'center', pb: 2 }}>
           {result && (
             <Box>
-              {/* Winning Numbers */}
-              <Box sx={{ mb: 3 }}>
+              {/* Score Details */}
+              <Box
+                sx={{
+                  p: 3,
+                  borderRadius: 2,
+                  bgcolor: 'background.default',
+                  mb: 2,
+                }}
+              >
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Winning Numbers
+                  Your Generated Numbers
                 </Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
-                  {result.luckyNumbers.map((num, idx) => (
+                  {result.generatedNumbers.map((num, idx) => (
                     <Box
                       key={idx}
                       sx={{
@@ -304,86 +294,22 @@ const PlayGamePage: React.FC = () => {
                     </Box>
                   ))}
                 </Box>
-
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Your Numbers
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                  {result.playerNumbers.map((num, idx) => (
-                    <Box
-                      key={idx}
-                      sx={{
-                        width: 50,
-                        height: 50,
-                        borderRadius: 1,
-                        background:
-                          num === result.luckyNumbers[idx]
-                            ? getScoreColor(result.matches)
-                            : '#e0e0e0',
-                        color: num === result.luckyNumbers[idx] ? 'white' : '#424242',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '1.5rem',
-                        fontWeight: 'bold',
-                        position: 'relative',
-                      }}
-                    >
-                      {num}
-                      {num === result.luckyNumbers[idx] && (
-                        <CheckIcon
-                          sx={{
-                            position: 'absolute',
-                            top: -8,
-                            right: -8,
-                            fontSize: 20,
-                            bgcolor: 'white',
-                            borderRadius: '50%',
-                            color: getScoreColor(result.matches),
-                          }}
-                        />
-                      )}
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-
-              {/* Score Details */}
-              <Box
-                sx={{
-                  p: 3,
-                  borderRadius: 2,
-                  bgcolor: 'background.default',
-                  mb: 2,
-                }}
-              >
+                
                 <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">
-                      Matches
-                    </Typography>
-                    <Typography variant="h4" fontWeight="bold">
-                      {result.matches}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12}>
                     <Typography variant="body2" color="text.secondary">
                       Score
                     </Typography>
                     <Typography
                       variant="h4"
                       fontWeight="bold"
-                      sx={{ color: getScoreColor(result.matches) }}
+                      sx={{ color: '#667eea' }}
                     >
                       {result.score}
                     </Typography>
                   </Grid>
                 </Grid>
               </Box>
-
-              <Typography variant="body1" color="text.secondary">
-                {result.result}
-              </Typography>
             </Box>
           )}
         </DialogContent>

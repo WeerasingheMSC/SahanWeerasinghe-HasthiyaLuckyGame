@@ -1,11 +1,11 @@
 import db from '../db.js';
 
 // Create a new game
-export const createGame = async (playerName, playerEmail) => {
-  // Check if email already exists with completed status
+export const createGame = async (playerEmail) => {
+  // Check if email already exists with is_played = true
   const checkQuery = `
-    SELECT id, status FROM games 
-    WHERE player_email = ? AND status = 'completed'
+    SELECT id, is_played FROM game_results 
+    WHERE email = ? AND is_played = TRUE
     LIMIT 1
   `;
   const [existing] = await db.query(checkQuery, [playerEmail]);
@@ -15,32 +15,31 @@ export const createGame = async (playerName, playerEmail) => {
   }
   
   const query = `
-    INSERT INTO games (player_name, player_email, status, created_at)
-    VALUES (?, ?, 'active', NOW())
+    INSERT INTO game_results (email, is_played, created_at)
+    VALUES (?, FALSE, NOW())
   `;
-  const [result] = await db.query(query, [playerName, playerEmail]);
-  return result.insertId;
+  const [result] = await db.query(query, [playerEmail]);
+  return {
+    id: result.insertId,
+    email: playerEmail
+  };
 };
 
 // Get all games with pagination
 export const getAllGames = async (limit, offset) => {
-  const countQuery = 'SELECT COUNT(*) as total FROM games';
+  const countQuery = 'SELECT COUNT(*) as total FROM game_results';
   const [countResult] = await db.query(countQuery);
   const total = countResult[0].total;
 
   const query = `
     SELECT 
       id,
-      player_name,
-      player_email,
-      player_numbers,
-      lucky_numbers,
-      matches,
+      email,
+      generated_numbers,
       score,
-      status,
-      created_at,
-      played_at
-    FROM games
+      is_played,
+      created_at
+    FROM game_results
     ORDER BY created_at DESC
     LIMIT ? OFFSET ?
   `;
@@ -54,16 +53,12 @@ export const getGameById = async (gameId) => {
   const query = `
     SELECT 
       id,
-      player_name,
-      player_email,
-      player_numbers,
-      lucky_numbers,
-      matches,
+      email,
+      generated_numbers,
       score,
-      status,
-      created_at,
-      played_at
-    FROM games
+      is_played,
+      created_at
+    FROM game_results
     WHERE id = ?
   `;
   const [games] = await db.query(query, [gameId]);
@@ -71,25 +66,19 @@ export const getGameById = async (gameId) => {
 };
 
 // Play a game (update with results)
-export const playGame = async (gameId, playerNumbers, luckyNumbers, matches, score) => {
+export const playGame = async (gameId, generatedNumbers, score) => {
   const query = `
-    UPDATE games
+    UPDATE game_results
     SET 
-      player_numbers = ?,
-      lucky_numbers = ?,
-      matches = ?,
+      generated_numbers = ?,
       score = ?,
-      status = 'completed',
-      played_at = NOW()
+      is_played = TRUE
     WHERE id = ?
   `;
-  const playerNumbersStr = JSON.stringify(playerNumbers);
-  const luckyNumbersStr = JSON.stringify(luckyNumbers);
+  const generatedNumbersStr = JSON.stringify(generatedNumbers);
   
   const [result] = await db.query(query, [
-    playerNumbersStr,
-    luckyNumbersStr,
-    matches,
+    generatedNumbersStr,
     score,
     gameId
   ]);
