@@ -13,8 +13,6 @@ import {
   TableRow,
   TablePagination,
   Paper,
-  Avatar,
-  Chip,
   CircularProgress,
   Alert,
   useTheme,
@@ -82,15 +80,6 @@ const LeaderboardPage: React.FC = () => {
     return null;
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   return (
     <Container maxWidth="lg">
       <Box sx={{ mb: 4 }}>
@@ -133,28 +122,29 @@ const LeaderboardPage: React.FC = () => {
                           Rank
                         </TableCell>
                         <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>
-                          Player
+                          Email
                         </TableCell>
                         <TableCell align="center" sx={{ color: 'white', fontWeight: 'bold' }}>
-                          Games Played
+                          Score
                         </TableCell>
                         <TableCell align="center" sx={{ color: 'white', fontWeight: 'bold' }}>
-                          Total Score
-                        </TableCell>
-                        <TableCell align="center" sx={{ color: 'white', fontWeight: 'bold' }}>
-                          Avg Matches
-                        </TableCell>
-                        <TableCell align="center" sx={{ color: 'white', fontWeight: 'bold' }}>
-                          Highest Score
+                          Date Played
                         </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {leaderboard.map((entry, index) => {
                         const globalRank = page * rowsPerPage + index + 1;
+                        const playedDate = new Date(entry.played_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        });
                         return (
                           <TableRow
-                            key={entry.player_name + index}
+                            key={entry.id}
                             sx={{
                               '&:hover': { bgcolor: 'action.hover' },
                               bgcolor: globalRank <= 3 ? `${getRankColor(globalRank)}10` : 'inherit',
@@ -173,42 +163,18 @@ const LeaderboardPage: React.FC = () => {
                               </Box>
                             </TableCell>
                             <TableCell>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Avatar
-                                  sx={{
-                                    bgcolor: getRankColor(globalRank),
-                                    fontWeight: 'bold',
-                                  }}
-                                >
-                                  {getInitials(entry.player_name)}
-                                </Avatar>
-                                <Box>
-                                  <Typography variant="body1" fontWeight="bold">
-                                    {entry.player_name}
-                                  </Typography>
-                                </Box>
-                              </Box>
-                            </TableCell>
-                            <TableCell align="center">
-                              <Chip
-                                label={entry.games_played}
-                                size="small"
-                                sx={{ minWidth: 50 }}
-                              />
+                              <Typography variant="body1">
+                                {entry.player_email}
+                              </Typography>
                             </TableCell>
                             <TableCell align="center">
                               <Typography variant="h6" fontWeight="bold" color="primary">
-                                {entry.total_score}
+                                {entry.score}
                               </Typography>
                             </TableCell>
                             <TableCell align="center">
-                              <Typography variant="body1">
-                                {Number(entry.avg_matches).toFixed(1)}
-                              </Typography>
-                            </TableCell>
-                            <TableCell align="center">
-                              <Typography variant="body1">
-                                {entry.highest_score}
+                              <Typography variant="body2" color="text.secondary">
+                                {playedDate}
                               </Typography>
                             </TableCell>
                           </TableRow>
@@ -224,9 +190,16 @@ const LeaderboardPage: React.FC = () => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {leaderboard.map((entry, index) => {
                     const globalRank = page * rowsPerPage + index + 1;
+                    const playedDate = new Date(entry.played_at).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    });
                     return (
                       <Card
-                        key={entry.player_name + index}
+                        key={entry.id}
                         elevation={2}
                         sx={{
                           bgcolor: globalRank <= 3 ? `${getRankColor(globalRank)}10` : 'background.paper',
@@ -244,21 +217,15 @@ const LeaderboardPage: React.FC = () => {
                                 #{globalRank}
                               </Typography>
                             </Box>
-                            <Avatar
-                              sx={{
-                                bgcolor: getRankColor(globalRank),
-                                width: 50,
-                                height: 50,
-                                fontWeight: 'bold',
-                              }}
-                            >
-                              {getInitials(entry.player_name)}
-                            </Avatar>
-                            <Box sx={{ flex: 1 }}>
-                              <Typography variant="body1" fontWeight="bold">
-                                {entry.player_name}
-                              </Typography>
-                            </Box>
+                          </Box>
+
+                          <Box sx={{ mb: 2 }}>
+                            <Typography variant="caption" color="text.secondary">
+                              Email
+                            </Typography>
+                            <Typography variant="body1" fontWeight="bold">
+                              {entry.player_email}
+                            </Typography>
                           </Box>
 
                           <Box
@@ -270,34 +237,18 @@ const LeaderboardPage: React.FC = () => {
                           >
                             <Box>
                               <Typography variant="caption" color="text.secondary">
-                                Total Score
+                                Score
                               </Typography>
                               <Typography variant="h6" fontWeight="bold" color="primary">
-                                {entry.total_score}
+                                {entry.score}
                               </Typography>
                             </Box>
                             <Box>
                               <Typography variant="caption" color="text.secondary">
-                                Games Played
+                                Date Played
                               </Typography>
-                              <Typography variant="h6" fontWeight="bold">
-                                {entry.games_played}
-                              </Typography>
-                            </Box>
-                            <Box>
-                              <Typography variant="caption" color="text.secondary">
-                                Avg Matches
-                              </Typography>
-                              <Typography variant="h6" fontWeight="bold">
-                                {Number(entry.avg_matches).toFixed(1)}
-                              </Typography>
-                            </Box>
-                            <Box>
-                              <Typography variant="caption" color="text.secondary">
-                                Highest Score
-                              </Typography>
-                              <Typography variant="h6" fontWeight="bold">
-                                {entry.highest_score}
+                              <Typography variant="body2">
+                                {playedDate}
                               </Typography>
                             </Box>
                           </Box>

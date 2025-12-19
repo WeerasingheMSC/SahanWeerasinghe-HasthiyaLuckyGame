@@ -1,12 +1,24 @@
 import db from '../db.js';
 
 // Create a new game
-export const createGame = async (playerName) => {
-  const query = `
-    INSERT INTO games (player_name, status, created_at)
-    VALUES (?, 'active', NOW())
+export const createGame = async (playerName, playerEmail) => {
+  // Check if email already exists with completed status
+  const checkQuery = `
+    SELECT id, status FROM games 
+    WHERE player_email = ? AND status = 'completed'
+    LIMIT 1
   `;
-  const [result] = await db.query(query, [playerName]);
+  const [existing] = await db.query(checkQuery, [playerEmail]);
+  
+  if (existing.length > 0) {
+    throw new Error('Game already played with this email');
+  }
+  
+  const query = `
+    INSERT INTO games (player_name, player_email, status, created_at)
+    VALUES (?, ?, 'active', NOW())
+  `;
+  const [result] = await db.query(query, [playerName, playerEmail]);
   return result.insertId;
 };
 
@@ -20,6 +32,7 @@ export const getAllGames = async (limit, offset) => {
     SELECT 
       id,
       player_name,
+      player_email,
       player_numbers,
       lucky_numbers,
       matches,
@@ -42,6 +55,7 @@ export const getGameById = async (gameId) => {
     SELECT 
       id,
       player_name,
+      player_email,
       player_numbers,
       lucky_numbers,
       matches,

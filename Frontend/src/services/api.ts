@@ -13,8 +13,8 @@ const api = axios.create({
 // Game API
 export const gameAPI = {
   // Create a new game session
-  createGame: async (playerName: string): Promise<ApiResponse<{ gameId: number; playerName: string; status: string }>> => {
-    const response = await api.post('/games', { playerName });
+  createGame: async (playerName: string, playerEmail: string): Promise<ApiResponse<{ gameId: number; playerName: string; playerEmail: string; status: string }>> => {
+    const response = await api.post('/games', { playerName, playerEmail });
     return response.data;
   },
 

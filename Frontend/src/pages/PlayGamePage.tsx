@@ -4,14 +4,12 @@ import {
   Card,
   CardContent,
   Typography,
-  TextField,
   Button,
   Box,
   Grid,
   Alert,
   CircularProgress,
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Fade,
@@ -28,39 +26,25 @@ import type { GameResult } from '../types';
 
 const PlayGamePage: React.FC = () => {
   const { player } = usePlayer();
-  const [numbers, setNumbers] = useState<string[]>(['', '', '', '']);
+  const [numbers, setNumbers] = useState<(number | null)[]>([null, null, null, null]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<GameResult | null>(null);
   const [showResult, setShowResult] = useState(false);
 
-  const handleNumberChange = (index: number, value: string) => {
-    // Only allow single digit 0-9
-    if (value === '' || (/^\d$/.test(value) && parseInt(value) >= 0 && parseInt(value) <= 9)) {
-      const newNumbers = [...numbers];
-      newNumbers[index] = value;
-      setNumbers(newNumbers);
-      setError(null);
-
-      // Auto-focus next field
-      if (value !== '' && index < 3) {
-        const nextField = document.getElementById(`number-${index + 1}`);
-        nextField?.focus();
-      }
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && numbers[index] === '' && index > 0) {
-      const prevField = document.getElementById(`number-${index - 1}`);
-      prevField?.focus();
-    }
+  const handleRoll = (index: number) => {
+    // Generate random number between 1-10
+    const randomNum = Math.floor(Math.random() * 10) + 1;
+    const newNumbers = [...numbers];
+    newNumbers[index] = randomNum;
+    setNumbers(newNumbers);
+    setError(null);
   };
 
   const handleSubmit = async () => {
     // Validation
-    if (numbers.some(n => n === '')) {
-      setError('Please enter all 4 numbers');
+    if (numbers.some(n => n === null)) {
+      setError('Please roll all 4 numbers');
       return;
     }
 
@@ -73,7 +57,7 @@ const PlayGamePage: React.FC = () => {
     setError(null);
 
     try {
-      const playerNumbers = numbers.map(Number);
+      const playerNumbers = numbers as number[];
       const response = await gameAPI.playGame(player.gameId, playerNumbers);
 
       setResult(response.data!);
@@ -86,12 +70,10 @@ const PlayGamePage: React.FC = () => {
   };
 
   const handlePlayAgain = () => {
-    setNumbers(['', '', '', '']);
+    setNumbers([null, null, null, null]);
     setResult(null);
     setShowResult(false);
     setError(null);
-    // Focus first field
-    document.getElementById('number-0')?.focus();
   };
 
   const getScoreColor = (matches: number) => {
@@ -128,47 +110,87 @@ const PlayGamePage: React.FC = () => {
         }}
       >
         <CardContent sx={{ p: 4 }}>
-          {/* Number Input Section */}
+          {/* Number Roll Section */}
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <CasinoIcon sx={{ fontSize: 60, color: '#667eea', mb: 2 }} />
             <Typography variant="h5" fontWeight="bold" gutterBottom>
-              Choose Your Numbers
+              Roll Your Numbers
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Select 4 numbers between 0 and 9
+              Click each button to generate a random number (1-10)
             </Typography>
           </Box>
 
-          <Grid container spacing={2} justifyContent="center" sx={{ mb: 4 }}>
+          <Grid container spacing={3} justifyContent="center" sx={{ mb: 4 }}>
             {numbers.map((num, index) => (
-              <Grid item xs={3} sm={2} key={index}>
-                <TextField
-                  id={`number-${index}`}
-                  value={num}
-                  onChange={(e) => handleNumberChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  variant="outlined"
-                  inputProps={{
-                    maxLength: 1,
-                    style: {
-                      textAlign: 'center',
-                      fontSize: '2rem',
-                      fontWeight: 'bold',
-                    },
-                  }}
+              <Grid item xs={6} sm={3} key={index}>
+                <Box
                   sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      height: 80,
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#667eea',
-                        borderWidth: 2,
-                      },
-                    },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 2,
                   }}
-                  disabled={loading}
-                  autoFocus={index === 0}
-                />
+                >
+                  <Button
+                    variant="contained"
+                    size="large"
+                    onClick={() => handleRoll(index)}
+                    disabled={loading}
+                    startIcon={<CasinoIcon />}
+                    sx={{
+                      width: '100%',
+                      py: 2,
+                      fontSize: '1rem',
+                      fontWeight: 'bold',
+                      background: num !== null 
+                        ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)' 
+                        : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      '&:hover': {
+                        background: num !== null
+                          ? 'linear-gradient(135deg, #45a049 0%, #4caf50 100%)'
+                          : 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                      },
+                    }}
+                  >
+                    Roll {index + 1}
+                  </Button>
+                  <Box
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: 2,
+                      border: '3px solid',
+                      borderColor: num !== null ? '#667eea' : '#e0e0e0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      bgcolor: num !== null ? '#667eea10' : 'background.paper',
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    {num !== null ? (
+                      <Typography
+                        variant="h3"
+                        fontWeight="bold"
+                        color="primary"
+                        sx={{
+                          animation: 'fadeIn 0.3s ease',
+                          '@keyframes fadeIn': {
+                            from: { opacity: 0, transform: 'scale(0.5)' },
+                            to: { opacity: 1, transform: 'scale(1)' },
+                          },
+                        }}
+                      >
+                        {num}
+                      </Typography>
+                    ) : (
+                      <Typography variant="h5" color="text.disabled">
+                        ?
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
               </Grid>
             ))}
           </Grid>
@@ -184,7 +206,7 @@ const PlayGamePage: React.FC = () => {
             size="large"
             fullWidth
             onClick={handleSubmit}
-            disabled={loading || numbers.some(n => n === '')}
+            disabled={loading || numbers.some(n => n === null)}
             sx={{
               py: 2,
               fontSize: '1.1rem',
@@ -195,7 +217,7 @@ const PlayGamePage: React.FC = () => {
               },
             }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Play Now!'}
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Submit & Compare!'}
           </Button>
 
           {/* Score Guide */}

@@ -9,13 +9,35 @@ export const GAME_INFO = {
 
 // Number constraints
 export const NUMBER_CONFIG = {
-  MIN_VALUE: 0,
-  MAX_VALUE: 9,
+  MIN_VALUE: 1,
+  MAX_VALUE: 10,
   NUMBERS_PER_GAME: 4,
-  TOTAL_POSSIBLE_NUMBERS: 10 // 0-9
+  TOTAL_POSSIBLE_NUMBERS: 10 // 1-10
 };
 
-// Score mapping based on number of matches
+// Hidden Numbers - Fixed numbers for the game (loaded from .env)
+export const getHiddenNumbers = () => {
+  const hiddenStr = process.env.HIDDEN_NUMBERS || '2,5,8,3';
+  const numbers = hiddenStr.split(',').map(n => parseInt(n.trim()));
+  
+  // Validate hidden numbers
+  if (numbers.length !== NUMBER_CONFIG.NUMBERS_PER_GAME) {
+    throw new Error(`HIDDEN_NUMBERS must contain exactly ${NUMBER_CONFIG.NUMBERS_PER_GAME} numbers`);
+  }
+  
+  const isValid = numbers.every(n => 
+    Number.isInteger(n) && n >= NUMBER_CONFIG.MIN_VALUE && n <= NUMBER_CONFIG.MAX_VALUE
+  );
+  
+  if (!isValid) {
+    throw new Error(`All HIDDEN_NUMBERS must be integers between ${NUMBER_CONFIG.MIN_VALUE} and ${NUMBER_CONFIG.MAX_VALUE}`);
+  }
+  
+  return numbers;
+};
+
+// Score mapping based on number of matches (Legacy - kept for prize tiers)
+// Note: Actual scoring now uses formula: Score = 100 - (Σ|Hidden_i - Generated_i|) × 2
 export const SCORE_MAP = {
   0: 0,      // No matches - No prize
   1: 10,     // 1 match - Small prize

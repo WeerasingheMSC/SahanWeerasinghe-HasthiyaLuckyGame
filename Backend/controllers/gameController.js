@@ -1,19 +1,36 @@
 import * as GameModel from '../models/gameModel.js';
-import { generateLuckyNumbers } from '../utils/gameLogic.js';
+import { getHiddenNumbers } from '../config/gameConfig.js';
+import { calculateScore } from '../logic/gameEngine.js';
 
 // Create a new game session
 export const createGame = async (req, res) => {
   try {
-    const { playerName } = req.body;
+    const { playerName, playerEmail } = req.body;
 
     if (!playerName || playerName.trim() === '') {
       return res.status(400).json({
         success: false,
-        message: 'Player name is required'
+        error: 'Player name is required'
       });
     }
 
-    const gameId = await GameModel.createGame(playerName);
+    if (!playerEmail || playerEmail.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        error: 'Email address is required'
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(playerEmail)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please enter a valid email address'
+      });
+    }
+
+    const gameId = await GameModel.createGame(playerName, playerEmail);
 
     res.status(201).json({
       success: true,
@@ -21,15 +38,25 @@ export const createGame = async (req, res) => {
       data: {
         gameId,
         playerName,
+        playerEmail,
         status: 'created'
       }
     });
   } catch (error) {
     console.error('Error creating game:', error);
+    
+    // Check if it's a duplicate email error
+    if (error.message === 'Game already played with this email') {
+      return res.status(400).json({
+        success: false,
+        error: 'Game already played with this email'
+      });
+    }
+    
     res.status(500).json({
       success: false,
-      message: 'Failed to create game',
-      error: error.message
+      error: 'Failed to create game',
+      message: error.message
     });
   }
 };
@@ -104,15 +131,15 @@ export const playGame = async (req, res) => {
       });
     }
 
-    // Validate each number is between 0-9
+    // Validate each number is between 1-10
     const isValid = playerNumbers.every(num => 
-      Number.isInteger(num) && num >= 0 && num <= 9
+      Number.isInteger(num) && num >= 1 && num <= 10
     );
 
     if (!isValid) {
       return res.status(400).json({
         success: false,
-        message: 'All numbers must be integers between 0 and 9'
+        message: 'All numbers must be integers between 1 and 10'
       });
     }
 
@@ -125,17 +152,16 @@ export const playGame = async (req, res) => {
       });
     }
 
-    // Generate lucky numbers
-    const luckyNumbers = generateLuckyNumbers();
+    // Get hidden numbers from config
+    const luckyNumbers = getHiddenNumbers();
 
     // Calculate matches
     const matches = playerNumbers.filter((num, index) => 
       num === luckyNumbers[index]
     ).length;
 
-    // Calculate score based on matches
-    const scoreMap = { 0: 0, 1: 10, 2: 50, 3: 200, 4: 1000 };
-    const score = scoreMap[matches];
+    // Calculate score using the formula
+    const score = calculateScore(playerNumbers, luckyNumbers);
 
     // Save game result
     const result = await GameModel.playGame(id, playerNumbers, luckyNumbers, matches, score);

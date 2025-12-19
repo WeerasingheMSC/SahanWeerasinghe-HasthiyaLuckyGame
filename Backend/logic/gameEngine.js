@@ -23,16 +23,31 @@ export const countMatches = (playerNumbers, luckyNumbers) => {
 };
 
 /**
- * Calculate score based on number of matches
- * @param {number} matches - Number of matching positions
- * @returns {number} Score points
+ * Calculate score based on position differences
+ * Formula: Score = 100 - (Σ|Hidden_i - Generated_i|) × 2
+ * @param {number[]} playerNumbers - Player's selected numbers
+ * @param {number[]} luckyNumbers - System-generated lucky numbers
+ * @returns {number} Score points (0-100)
  */
-export const calculateScore = (matches) => {
-  if (!Number.isInteger(matches) || matches < 0 || matches > NUMBER_CONFIG.NUMBERS_PER_GAME) {
-    throw new Error(`Matches must be an integer between 0 and ${NUMBER_CONFIG.NUMBERS_PER_GAME}`);
+export const calculateScore = (playerNumbers, luckyNumbers) => {
+  if (!Array.isArray(playerNumbers) || !Array.isArray(luckyNumbers)) {
+    throw new Error('Both playerNumbers and luckyNumbers must be arrays');
   }
   
-  return SCORE_MAP[matches] || 0;
+  if (playerNumbers.length !== luckyNumbers.length) {
+    throw new Error('Player numbers and lucky numbers must have the same length');
+  }
+  
+  // Calculate sum of absolute differences
+  const sumOfDifferences = playerNumbers.reduce((sum, playerNum, index) => {
+    return sum + Math.abs(playerNum - luckyNumbers[index]);
+  }, 0);
+  
+  // Apply formula: 100 - (sum × 2)
+  const score = 100 - (sumOfDifferences * 2);
+  
+  // Ensure score is within valid range (0-100)
+  return Math.max(0, Math.min(100, score));
 };
 
 /**
@@ -85,7 +100,7 @@ export const getMatchDetails = (playerNumbers, luckyNumbers) => {
  */
 export const calculateGameResult = (playerNumbers, luckyNumbers) => {
   const matches = countMatches(playerNumbers, luckyNumbers);
-  const score = calculateScore(matches);
+  const score = calculateScore(playerNumbers, luckyNumbers);
   const prizeTier = getPrizeTier(matches);
   const jackpot = isJackpot(matches);
   const winner = isWinner(matches);
