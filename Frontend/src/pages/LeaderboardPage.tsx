@@ -84,7 +84,7 @@ const LeaderboardPage: React.FC = () => {
     <Container maxWidth="lg">
       <Box sx={{ mb: 4 }}>
         <Typography variant="h3" fontWeight="bold" gutterBottom>
-          Leaderboard 🏆
+          Leaderboard
         </Typography>
         <Typography variant="h6" color="text.secondary">
           Top players and their scores

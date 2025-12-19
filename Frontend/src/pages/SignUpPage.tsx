@@ -61,7 +61,7 @@ const SignUpPage: React.FC = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#f5f5f5',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -133,22 +133,6 @@ const SignUpPage: React.FC = () => {
                 {loading ? <CircularProgress size={24} color="inherit" /> : 'Start Playing'}
               </Button>
             </form>
-
-            {/* Game Info */}
-            <Box sx={{ mt: 4, p: 3, bgcolor: '#f5f5f5', borderRadius: 2 }}>
-              <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                🎮 How to Play:
-              </Typography>
-              <Typography variant="body2" color="text.secondary" paragraph>
-                • Select 4 numbers between 0 and 9
-              </Typography>
-              <Typography variant="body2" color="text.secondary" paragraph>
-                • Match numbers in exact positions to win
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                • Jackpot: 1000 points for 4 matches!
-              </Typography>
-            </Box>
           </CardContent>
         </Card>
 
@@ -156,9 +140,9 @@ const SignUpPage: React.FC = () => {
         <Typography
           variant="body2"
           align="center"
-          sx={{ mt: 3, color: 'white', opacity: 0.8 }}
+          sx={{ mt: 3, color: 'black', opacity: 0.8 }}
         >
-          © 2025 Hasthiya Lucky 4 • Good Luck! 🍀
+          © 2025 Hasthiya Lucky 4 • Good Luck!
         </Typography>
       </Container>
     </Box>

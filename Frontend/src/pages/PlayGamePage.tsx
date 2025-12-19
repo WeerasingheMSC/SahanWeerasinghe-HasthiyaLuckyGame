@@ -206,7 +206,7 @@ const PlayGamePage: React.FC = () => {
           {/* Score Guide */}
           <Box sx={{ mt: 4, p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Prize Guide 🏆
+              Prize Guide 
             </Typography>
             <Grid container spacing={1}>
               {[

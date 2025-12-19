@@ -40,7 +40,7 @@ const DashboardHome: React.FC = () => {
       {/* Welcome Section */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h3" fontWeight="bold" gutterBottom>
-          Welcome! 👋
+          Welcome! 
         </Typography>
         <Typography variant="h6" color="text.secondary">
           Ready to play Lucky 4 and win amazing prizes?
@@ -230,7 +230,7 @@ const DashboardHome: React.FC = () => {
       <Card elevation={3}>
         <CardContent sx={{ p: 4 }}>
           <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-            Scoring Guide 🎯
+            Scoring Guide 
           </Typography>
           
           <Box sx={{ mb: 3, p: 3, bgcolor: '#667eea10', borderRadius: 2 }}>
