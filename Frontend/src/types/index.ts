@@ -27,12 +27,11 @@ export interface Game {
 }
 
 export interface LeaderboardEntry {
+  id: number;
   player_name: string;
-  games_played: number;
-  total_score: number;
-  highest_score: number;
-  avg_matches: number;
-  last_played: string;
+  player_email: string;
+  score: number;
+  played_at: string;
 }
 
 export interface PaginationMeta {

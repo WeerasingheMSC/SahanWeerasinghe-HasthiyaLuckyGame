@@ -1,9 +1,9 @@
 import db from '../db.js';
 
-// Get leaderboard (top players by total score)
+// Get leaderboard (individual game results sorted by score)
 export const getLeaderboard = async (limit, offset) => {
   const countQuery = `
-    SELECT COUNT(DISTINCT player_name) as total 
+    SELECT COUNT(*) as total 
     FROM games 
     WHERE status = 'completed'
   `;
@@ -12,16 +12,14 @@ export const getLeaderboard = async (limit, offset) => {
 
   const query = `
     SELECT 
+      id,
       player_name,
-      COUNT(*) as games_played,
-      SUM(score) as total_score,
-      MAX(score) as highest_score,
-      AVG(matches) as avg_matches,
-      MAX(played_at) as last_played
+      player_email,
+      score,
+      played_at
     FROM games
     WHERE status = 'completed'
-    GROUP BY player_name
-    ORDER BY total_score DESC, games_played DESC
+    ORDER BY score DESC, played_at DESC
     LIMIT ? OFFSET ?
   `;
   const [leaderboard] = await db.query(query, [limit, offset]);

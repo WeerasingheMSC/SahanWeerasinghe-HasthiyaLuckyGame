@@ -52,7 +52,7 @@ const SignUpPage: React.FC = () => {
     // Create game session via API
     setLoading(true);
     try {
-      const response = await gameAPI.createGame(playerName.trim());
+      const response = await gameAPI.createGame(playerName.trim(), email.trim());
       
       // Save player info with gameId from backend
       setPlayer({ 
@@ -62,7 +62,8 @@ const SignUpPage: React.FC = () => {
       });
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to create player. Please try again.');
+      const errorMessage = err.response?.data?.error || 'Failed to create player. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
